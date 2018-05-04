@@ -20,13 +20,16 @@
             android:id="@+id/true_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/true_button" />
+            android:text="@string/true_button"
+            android:background="@color/true_Green"
+            android:layout_marginRight="10dp"/>
 
         <Button
             android:id="@+id/false_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/false_button" />
+            android:text="@string/false_button"
+            android:background="@color/false_Red"/>
     </LinearLayout>
 
     <Button

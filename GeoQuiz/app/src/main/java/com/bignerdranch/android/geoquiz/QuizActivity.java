@@ -12,11 +12,15 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Arrays;
+
 public class QuizActivity extends AppCompatActivity {
 
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
     private static final String KEY_CHEATER = "cheater";
+    private static final String KEY_CHEAT_BANK = "cheat bank";
+    private static final String KEY_CLICK_BANK = "click bank";
     private static final int REQUEST_CODE_CHEAT = 0;
 
     private Button mTrueButton;
@@ -35,6 +39,9 @@ public class QuizActivity extends AppCompatActivity {
             new Question(R.string.question_asia, true),
     };
 
+    private boolean[] mCheatBank = new boolean[mQuestionBank.length];
+    private boolean[] mClickedBank = new boolean[mQuestionBank.length];
+
     private int mCurrentIndex = 0;
     private boolean mIsCheater;
 
@@ -47,7 +54,9 @@ public class QuizActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
             mIsCheater = savedInstanceState.getBoolean(KEY_CHEATER, false);
-            }
+            mCheatBank = savedInstanceState.getBooleanArray(KEY_CHEAT_BANK);
+            mClickedBank = savedInstanceState.getBooleanArray(KEY_CLICK_BANK);
+        }
 
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
         mQuestionTextView.setOnClickListener(new View.OnClickListener() {
@@ -66,6 +75,10 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 checkAnswer(true);
+                mClickedBank[mCurrentIndex]=true;
+                updateButton();
+                Log.d(TAG, "Clicked array: "+mClickedBank[mCurrentIndex]);
+
             }
         });
 
@@ -74,6 +87,8 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 checkAnswer(false);
+                mClickedBank[mCurrentIndex]=true;
+                updateButton();
             }
         });
 
@@ -87,6 +102,7 @@ public class QuizActivity extends AppCompatActivity {
                 }
                 mIsCheater = false;
                 updateQuestion();
+                updateButton();
             }
         });
 
@@ -109,7 +125,8 @@ public class QuizActivity extends AppCompatActivity {
                 if (mCurrentIndex == -1){
                     mCurrentIndex = mQuestionBank.length - 1;
                 }
-                updateQuestion();}
+                updateQuestion();
+                updateButton();}
             });
 
         updateQuestion();
@@ -127,7 +144,10 @@ public class QuizActivity extends AppCompatActivity {
             }
             mIsCheater = CheatActivity.wasAnswerShown(data);
             if (mIsCheater == true) {
-                mQuestionBank[mCurrentIndex].setCheated();
+                mCheatBank[mCurrentIndex]=true;
+            }
+            if(mIsCheater == false) {
+                mCheatBank[mCurrentIndex]=false;
             }
         }
     }
@@ -156,6 +176,8 @@ public class QuizActivity extends AppCompatActivity {
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
         savedInstanceState.putBoolean(KEY_CHEATER, mIsCheater);
+        savedInstanceState.putBooleanArray(KEY_CHEAT_BANK, mCheatBank);
+        savedInstanceState.putBooleanArray(KEY_CLICK_BANK, mClickedBank);
     }
 
     @Override
@@ -170,6 +192,17 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "onDestroy() called");
     }
 
+    private void updateButton(){
+        if (mClickedBank[mCurrentIndex]==true){
+            mTrueButton.setEnabled(false);
+            mFalseButton.setEnabled(false);
+        }
+        else if (mClickedBank[mCurrentIndex]==false){
+            mTrueButton.setEnabled(true);
+            mFalseButton.setEnabled(true);
+        }
+    }
+
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
@@ -180,7 +213,7 @@ public class QuizActivity extends AppCompatActivity {
 
         int messageResId = 0;
 
-        if (mQuestionBank[mCurrentIndex].getCheated()||mIsCheater){
+        if (mCheatBank[mCurrentIndex]==true||mIsCheater){
             messageResId = R.string.judgment_toast;
         } else{
             if (userPressedTrue == answerIsTrue){

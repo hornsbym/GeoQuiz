@@ -1,16 +1,17 @@
 package com.bignerdranch.android.geoquiz;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 public class Question {
 
     private int mTextResId;
     private boolean mAnswerTrue;
-    private boolean mCheated;
 
     public Question(int textResId, boolean answerTrue) {
 
         mTextResId = textResId;
         mAnswerTrue = answerTrue;
-        mCheated = false;
     }
 
     public int getTextResId() {
@@ -29,7 +30,4 @@ public class Question {
         mAnswerTrue = answerTrue;
     }
 
-    public void setCheated(){ mCheated = true; }
-
-    public boolean getCheated(){return mCheated;}
 }
