@@ -130,6 +130,7 @@ public class QuizActivity extends AppCompatActivity {
             });
 
         updateQuestion();
+        updateButton();
     }
 
     @Override
